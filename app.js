@@ -17,6 +17,38 @@ const zones = {
   mail: { x: 522, y: 222 }
 };
 
+const propLayers = [
+  { id: 'task-board', label: 'Task Board', x: 28, y: 214, w: 252, h: 162, solid: true },
+  { id: 'agent-portal', label: 'Agent Portal', x: 768, y: 220, w: 174, h: 126, solid: true },
+  { id: 'service-desk', label: 'Service Desk', x: 724, y: 478, w: 184, h: 124, solid: true },
+  { id: 'secretary-station', label: 'Secretary', x: 52, y: 420, w: 194, h: 116, solid: true },
+  { id: 'rest-area', label: 'Rest Area', x: 34, y: 572, w: 260, h: 112, solid: false },
+  { id: 'desk-1', label: 'Desk 1', x: 352, y: 274, w: 156, h: 124, solid: true },
+  { id: 'desk-2', label: 'Desk 2', x: 562, y: 274, w: 156, h: 124, solid: true },
+  { id: 'desk-3', label: 'Desk 3', x: 352, y: 462, w: 156, h: 124, solid: true },
+  { id: 'desk-4', label: 'Desk 4', x: 562, y: 462, w: 156, h: 124, solid: true },
+  { id: 'desk-5', label: 'Desk 5', x: 694, y: 332, w: 156, h: 124, solid: true },
+  { id: 'desk-6', label: 'Desk 6', x: 218, y: 466, w: 156, h: 124, solid: true }
+];
+
+const collisionRects = propLayers
+  .filter(layer => layer.solid)
+  .map(layer => ({ x: layer.x + 10, y: layer.y + 18, w: layer.w - 20, h: layer.h - 22 }));
+
+const spriteAtlas = {
+  codex: { row: 0 },
+  hermes: { row: 1 },
+  claude: { row: 2 },
+  openclaw: { row: 3 },
+  temp: { row: 4 }
+};
+
+const walkGrid = {
+  size: 48,
+  cols: 20,
+  rows: 15
+};
+
 const candidates = [
   { name: 'Codex', role: 'Coding agent', specialty: 'implementation', salary: 120, sprite: 'codex', color: '#64d2a6' },
   { name: 'Hermes', role: 'Ops messenger', specialty: 'coordination', salary: 95, sprite: 'hermes', color: '#ffcf66' },
@@ -91,7 +123,7 @@ const els = {
   dayStat: document.querySelector('#dayStat'),
   boardSummary: document.querySelector('#boardSummary'),
   restSummary: document.querySelector('#restSummary'),
-  deskLayer: document.querySelector('#deskLayer'),
+  propLayer: document.querySelector('#propLayer'),
   routeLayer: document.querySelector('#routeLayer'),
   spriteLayer: document.querySelector('#spriteLayer'),
   fxLayer: document.querySelector('#fxLayer'),
@@ -113,7 +145,7 @@ const els = {
 init();
 
 function init() {
-  renderDesks();
+  renderProps();
   renderCandidates();
   hydrateSystemFields();
   wireEvents();
@@ -175,12 +207,10 @@ function renderHud() {
   els.restSummary.textContent = `${state.employees.filter(employee => employee.status === 'resting').length} idle`;
 }
 
-function renderDesks() {
-  els.deskLayer.innerHTML = zones.desks.map((desk, index) => `
-    <div class="desk" style="left:${desk.x - 78}px;top:${desk.y - 62}px">
-      <span>Desk ${index + 1}</span>
-      <i></i>
-    </div>
+function renderProps() {
+  els.propLayer.innerHTML = propLayers.map(layer => `
+    <img class="prop prop-${layer.id}" src="assets/layers/${layer.id}.png" alt="${escapeHtml(layer.label)}"
+      style="left:${layer.x}px;top:${layer.y}px;width:${layer.w}px;height:${layer.h}px" />
   `).join('');
 }
 
@@ -246,12 +276,15 @@ function renderTaskCard(task) {
 function renderSprites() {
   els.spriteLayer.innerHTML = state.employees.map(employee => {
     const point = getPosition(employee);
+    const atlas = spriteAtlas[employee.sprite] || spriteAtlas.temp;
+    const frame = spriteFrame(employee);
     return `
       <button class="sprite ${employee.status} ${employee.id === state.selectedId ? 'selected' : ''}" type="button"
-        data-sprite="${escapeHtml(employee.id)}" style="left:${point.x}px;top:${point.y}px;--agent:${employee.color}">
+        data-sprite="${escapeHtml(employee.id)}" style="left:${point.x}px;top:${point.y}px;--agent:${employee.color};--sprite-x:${frame * -48}px;--sprite-y:${atlas.row * -64}px;--sprite-next-x:${((frame + 1) % 3) * -48}px">
         <span class="thought-bubble">${escapeHtml(employee.thought)}</span>
         <span class="status-icon">${statusIcon(employee.status)}</span>
-        <span class="head"></span><span class="body"></span><span class="legs"></span>
+        <span class="sprite-shadow"></span>
+        <span class="sprite-frame"></span>
         <small>${escapeHtml(employee.name)}</small>
       </button>
     `;
@@ -267,14 +300,11 @@ function renderSprites() {
 }
 
 function renderRoutes() {
-  els.routeLayer.innerHTML = state.employees.filter(employee => employee.status !== 'resting').map(employee => {
+  els.routeLayer.innerHTML = state.employees.filter(employee => employee.status !== 'resting').flatMap(employee => {
     const from = zones.desks[employee.desk % zones.desks.length];
     const to = getPosition(employee);
-    const left = Math.min(from.x, to.x);
-    const top = Math.min(from.y, to.y);
-    const width = Math.abs(from.x - to.x) || 2;
-    const height = Math.abs(from.y - to.y) || 2;
-    return `<span class="route ${employee.status}" style="left:${left}px;top:${top}px;width:${width}px;height:${height}px"></span>`;
+    const points = findRoute(from, to, employee.id);
+    return points.slice(1).map((point, index) => renderRouteSegment(points[index], point, employee.status));
   }).join('');
 }
 
@@ -635,16 +665,124 @@ function getActiveTask(ownerId) {
 }
 
 function getPosition(employee) {
-  if (employee.status === 'resting') return jitter(zones.rest, employee.desk);
-  if (employee.status === 'outsourcing') return jitter(zones.outsource, employee.desk);
-  if (employee.status === 'board') return jitter(zones.board, employee.desk);
-  if (employee.status === 'portal') return jitter(zones.portal, employee.desk);
-  if (employee.status === 'calling') return jitter(zones.mail, employee.desk);
-  return jitter(zones.desks[employee.desk % zones.desks.length], employee.desk);
+  const queueSeed = queueIndex(employee);
+  if (employee.status === 'resting') return queuePoint(zones.rest, queueSeed, 44, 24);
+  if (employee.status === 'outsourcing') return queuePoint(zones.outsource, queueSeed, 42, 30);
+  if (employee.status === 'board') return queuePoint(zones.board, queueSeed, 60, 28);
+  if (employee.status === 'portal') return queuePoint(zones.portal, queueSeed, 38, 26);
+  if (employee.status === 'calling') return queuePoint(zones.mail, queueSeed, 42, 24);
+  return queuePoint(zones.desks[employee.desk % zones.desks.length], queueSeed, 36, 28);
 }
 
-function jitter(point, seed) {
-  return { x: point.x + ((seed % 3) - 1) * 18, y: point.y + (seed % 2) * 14 };
+function queuePoint(point, seed, gapX, gapY) {
+  const lane = seed % 4;
+  const row = Math.floor(seed / 4) % 2;
+  return {
+    x: point.x + (lane - 1.5) * gapX,
+    y: point.y + row * gapY
+  };
+}
+
+function queueIndex(employee) {
+  const target = targetForStatus(employee.status);
+  const peers = state.employees.filter(item => targetForStatus(item.status) === target);
+  return Math.max(0, peers.findIndex(item => item.id === employee.id));
+}
+
+function findRoute(from, to, employeeId) {
+  const start = nearestOpenCell(from);
+  const goal = nearestOpenCell(to);
+  const key = cellKey(start);
+  const queue = [start];
+  const cameFrom = new Map([[key, null]]);
+  const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+
+  while (queue.length) {
+    const current = queue.shift();
+    if (current.x === goal.x && current.y === goal.y) break;
+    for (const [dx, dy] of dirs) {
+      const next = { x: current.x + dx, y: current.y + dy };
+      const nextKey = cellKey(next);
+      if (cameFrom.has(nextKey) || isBlockedCell(next, employeeId)) continue;
+      cameFrom.set(nextKey, current);
+      queue.push(next);
+    }
+  }
+
+  if (!cameFrom.has(cellKey(goal))) return [from, to];
+  const cells = [];
+  let cursor = goal;
+  while (cursor) {
+    cells.unshift(cursor);
+    cursor = cameFrom.get(cellKey(cursor));
+  }
+  return simplifyRoute([from, ...cells.map(cellCenter), to]);
+}
+
+function nearestOpenCell(point) {
+  const base = pointToCell(point);
+  if (!isBlockedCell(base)) return base;
+  for (let radius = 1; radius < 5; radius += 1) {
+    for (let y = -radius; y <= radius; y += 1) {
+      for (let x = -radius; x <= radius; x += 1) {
+        const cell = { x: base.x + x, y: base.y + y };
+        if (!isBlockedCell(cell)) return cell;
+      }
+    }
+  }
+  return base;
+}
+
+function isBlockedCell(cell) {
+  if (cell.x < 0 || cell.y < 0 || cell.x >= walkGrid.cols || cell.y >= walkGrid.rows) return true;
+  const center = cellCenter(cell);
+  return collisionRects.some(rect => pointInRect(center, rect));
+}
+
+function pointToCell(point) {
+  return {
+    x: clamp(Math.floor(point.x / walkGrid.size), 0, walkGrid.cols - 1),
+    y: clamp(Math.floor(point.y / walkGrid.size), 0, walkGrid.rows - 1)
+  };
+}
+
+function cellCenter(cell) {
+  return {
+    x: cell.x * walkGrid.size + walkGrid.size / 2,
+    y: cell.y * walkGrid.size + walkGrid.size / 2
+  };
+}
+
+function cellKey(cell) {
+  return `${cell.x}:${cell.y}`;
+}
+
+function pointInRect(point, rect) {
+  return point.x >= rect.x && point.x <= rect.x + rect.w && point.y >= rect.y && point.y <= rect.y + rect.h;
+}
+
+function simplifyRoute(points) {
+  return points.filter((point, index) => {
+    if (index === 0 || index === points.length - 1) return true;
+    const prev = points[index - 1];
+    const next = points[index + 1];
+    return !((prev.x === point.x && point.x === next.x) || (prev.y === point.y && point.y === next.y));
+  });
+}
+
+function renderRouteSegment(from, to, status) {
+  const left = Math.min(from.x, to.x);
+  const top = Math.min(from.y, to.y);
+  const width = Math.max(2, Math.abs(from.x - to.x));
+  const height = Math.max(2, Math.abs(from.y - to.y));
+  return `<span class="route ${status}" style="left:${left}px;top:${top}px;width:${width}px;height:${height}px"></span>`;
+}
+
+function spriteFrame(employee) {
+  if (employee.status === 'resting') return 0;
+  if (employee.status === 'calling') return 1;
+  if (employee.status === 'board') return 2;
+  return employee.energy % 2 ? 1 : 2;
 }
 
 function targetForStatus(status) {
