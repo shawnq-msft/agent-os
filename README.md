@@ -2,6 +2,8 @@
 
 A static office-management RPG where the user plays the boss of an AI-agent office. Agents move between desks, task board, rest area, agent portal, voice/mail contact, and outsource service desk while tasks progress over time.
 
+The current mockup demo maps randomized agent state into scene animation: each agent walks between office zones, shows a status badge, and emits a live thought bubble. Use **Systems -> Demo Beat** to force a new animated office state immediately.
+
 ## Run
 
 Open `index.html` in a browser. No package install is required for the game itself.

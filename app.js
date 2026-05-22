@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'agent-os-office-rpg-v2';
+const STORAGE_KEY = 'agent-os-office-rpg-v3';
 
 const zones = {
   desks: [
@@ -24,8 +24,30 @@ const candidates = [
   { name: 'Open Claw', role: 'Tool runner', specialty: 'outsourcing', salary: 100, sprite: 'openclaw', color: '#ff8a7a' },
   { name: 'Nova Temp', role: 'Research temp', specialty: 'research', salary: 55, sprite: 'temp', color: '#dda6ff' },
   { name: 'Qwen Analyst', role: 'Data temp', specialty: 'analysis', salary: 60, sprite: 'temp', color: '#68d8ff' },
-  { name: 'Sage Architect', role: 'System planner', specialty: 'architecture', salary: 130, sprite: 'temp', color: '#a8e06e' }
+  { name: 'Sage Architect', role: 'System planner', specialty: 'architecture', salary: 130, sprite: 'temp', color: '#a8e06e' },
+  { name: 'Atlas Clerk', role: 'Task board temp', specialty: 'coordination', salary: 58, sprite: 'temp', color: '#f2a86b' },
+  { name: 'Mira QA', role: 'Quality temp', specialty: 'review', salary: 62, sprite: 'temp', color: '#f084b9' }
 ];
+
+const taskSeeds = [
+  'Draft boss briefing',
+  'Patch agent portal flow',
+  'Summarize vendor output',
+  'Refine office animation pass',
+  'Prepare standup notes',
+  'Audit task board state',
+  'Prototype Azure voice handoff',
+  'Clean inbox requests'
+];
+
+const thoughtBank = {
+  working: ['Shipping a slice', 'Checking context', 'Running tests', 'Tightening scope', 'Almost there'],
+  resting: ['Recharging focus', 'Waiting for task', 'Coffee then clarity', 'Idle but ready', 'Battery up'],
+  calling: ['On voice with boss', 'Clarifying ask', 'Taking notes', 'Confirming priority'],
+  outsourcing: ['Calling tools', 'Asking Gemini', 'Checking ChatGPT', 'Fetching outside help'],
+  board: ['Updating board', 'Moving task card', 'Posting progress', 'Syncing status'],
+  portal: ['Entering portal', 'Temp onboarding', 'New contract ready']
+};
 
 const defaultState = {
   cash: 4200,
@@ -33,29 +55,34 @@ const defaultState = {
   day: 1,
   speed: 3,
   selectedId: 'codex',
-  nextTaskId: 5,
-  nextEmployeeId: 5,
+  nextTaskId: 7,
+  nextEmployeeId: 7,
+  beat: 0,
   systems: {
     voiceEndpoint: '',
     emailWorkspace: ''
   },
   employees: [
-    makeEmployee('codex', candidates[0], 0, false, 'working', 'Build office RPG core'),
-    makeEmployee('hermes', candidates[1], 1, false, 'resting', ''),
-    makeEmployee('claude', candidates[2], 2, false, 'working', 'Review management loop'),
-    makeEmployee('openclaw', candidates[3], 3, false, 'outsourcing', 'Call external tool desk')
+    makeEmployee('codex', candidates[0], 0, false, 'working', 'Build office RPG core', 'Shipping a slice'),
+    makeEmployee('hermes', candidates[1], 1, false, 'board', 'Daily agent standup', 'Syncing status'),
+    makeEmployee('claude', candidates[2], 2, false, 'working', 'Review management loop', 'Checking context'),
+    makeEmployee('openclaw', candidates[3], 3, false, 'outsourcing', 'Call external tool desk', 'Calling tools'),
+    makeEmployee('nova-temp-5', candidates[4], 4, true, 'portal', '', 'Temp onboarding'),
+    makeEmployee('qwen-analyst-6', candidates[5], 5, true, 'resting', '', 'Waiting for task')
   ],
   tasks: [
-    makeTask(1, 'Build office RPG core', 'codex', 'doing', 'High', 'none', ''),
-    makeTask(2, 'Review management loop', 'claude', 'doing', 'Normal', 'weekly', ''),
-    makeTask(3, 'Daily agent standup', 'hermes', 'todo', 'Normal', 'daily', ''),
-    makeTask(4, 'Call external tool desk', 'openclaw', 'doing', 'Normal', 'none', '')
+    makeTask(1, 'Build office RPG core', 'codex', 'doing', 'High', 'none', '', 38),
+    makeTask(2, 'Review management loop', 'claude', 'doing', 'Normal', 'weekly', '', 22),
+    makeTask(3, 'Daily agent standup', 'hermes', 'todo', 'Normal', 'daily', '', 0),
+    makeTask(4, 'Call external tool desk', 'openclaw', 'doing', 'Normal', 'none', '', 54),
+    makeTask(5, 'Prototype voice call hook', 'nova-temp-5', 'todo', 'High', 'none', '', 0),
+    makeTask(6, 'Build status bubble demo', 'qwen-analyst-6', 'doing', 'Normal', 'none', '', 16)
   ],
   mail: [],
   log: []
 };
 
-let state = loadState();
+let state = normalizeState(loadState());
 let tickHandle;
 
 const els = {
@@ -79,7 +106,8 @@ const els = {
   tempHire: document.querySelector('#tempHire'),
   voiceEndpoint: document.querySelector('#voiceEndpoint'),
   emailWorkspace: document.querySelector('#emailWorkspace'),
-  speedSlider: document.querySelector('#speedSlider')
+  speedSlider: document.querySelector('#speedSlider'),
+  demoBeatButton: document.querySelector('#demoBeatButton')
 };
 
 init();
@@ -89,7 +117,7 @@ function init() {
   renderCandidates();
   hydrateSystemFields();
   wireEvents();
-  log('Secretary initialized the office environment, desks, task board, portal, and service desk.', false);
+  log('Secretary initialized the dynamic mockup: scene zones, animated agents, state bubbles, and task routing are online.', false);
   render();
   startLoop();
 }
@@ -104,6 +132,7 @@ function wireEvents() {
   document.querySelector('#portalZone').addEventListener('click', () => {
     els.tempHire.checked = true;
     els.hireDialog.showModal();
+    pulse(zones.portal.x, zones.portal.y, 'hire');
   });
   document.querySelector('#confirmHireButton').addEventListener('click', hireAgent);
   document.querySelector('#callButton').addEventListener('click', callSelected);
@@ -118,6 +147,7 @@ function wireEvents() {
   document.querySelector('#clearMessageButton').addEventListener('click', () => els.messageBox.value = '');
   document.querySelector('#saveButton').addEventListener('click', saveSystems);
   document.querySelector('#resetButton').addEventListener('click', newDay);
+  if (els.demoBeatButton) els.demoBeatButton.addEventListener('click', demoBeat);
   els.speedSlider.addEventListener('input', () => {
     state.speed = Number(els.speedSlider.value);
     startLoop();
@@ -156,11 +186,11 @@ function renderDesks() {
 
 function renderEmployees() {
   els.employeeList.innerHTML = state.employees.map(employee => `
-    <button class="employee-card ${employee.id === state.selectedId ? 'active' : ''}" data-employee="${employee.id}" type="button">
+    <button class="employee-card ${employee.id === state.selectedId ? 'active' : ''}" data-employee="${escapeHtml(employee.id)}" type="button">
       <span class="avatar-dot" style="--dot:${employee.color}"></span>
       <span class="employee-main">
-        <strong>${employee.name}</strong>
-        <small>${employee.role}</small>
+        <strong>${escapeHtml(employee.name)}</strong>
+        <small>${escapeHtml(employee.role)} / ${escapeHtml(employee.thought)}</small>
         <progress max="100" value="${employee.energy}"></progress>
       </span>
       <span class="status-pill ${employee.status}">${labelStatus(employee.status)}</span>
@@ -173,7 +203,7 @@ function renderEmployees() {
 }
 
 function renderTaskOwners() {
-  els.taskOwner.innerHTML = state.employees.map(employee => `<option value="${employee.id}">${employee.name}</option>`).join('');
+  els.taskOwner.innerHTML = state.employees.map(employee => `<option value="${escapeHtml(employee.id)}">${escapeHtml(employee.name)}</option>`).join('');
   els.taskOwner.value = state.selectedId;
 }
 
@@ -206,8 +236,8 @@ function renderTaskCard(task) {
   const due = task.start ? ` / ${formatShortDate(task.start)}` : '';
   return `
     <button class="task-card ${task.priority.toLowerCase()}" type="button" data-task="${task.id}">
-      <strong>${task.title}</strong>
-      <small>${owner?.name || 'Unassigned'} / ${task.priority}${repeat}${due}</small>
+      <strong>${escapeHtml(task.title)}</strong>
+      <small>${escapeHtml(owner?.name || 'Unassigned')} / ${task.priority}${repeat}${due}</small>
       <span style="width:${task.progress}%"></span>
     </button>
   `;
@@ -218,15 +248,21 @@ function renderSprites() {
     const point = getPosition(employee);
     return `
       <button class="sprite ${employee.status} ${employee.id === state.selectedId ? 'selected' : ''}" type="button"
-        data-sprite="${employee.id}" style="left:${point.x}px;top:${point.y}px;--agent:${employee.color}">
+        data-sprite="${escapeHtml(employee.id)}" style="left:${point.x}px;top:${point.y}px;--agent:${employee.color}">
+        <span class="thought-bubble">${escapeHtml(employee.thought)}</span>
+        <span class="status-icon">${statusIcon(employee.status)}</span>
         <span class="head"></span><span class="body"></span><span class="legs"></span>
-        <small>${employee.name}</small>
+        <small>${escapeHtml(employee.name)}</small>
       </button>
     `;
   }).join('');
 
   els.spriteLayer.querySelectorAll('[data-sprite]').forEach(sprite => {
-    sprite.addEventListener('click', () => selectEmployee(sprite.dataset.sprite));
+    sprite.addEventListener('click', () => {
+      selectEmployee(sprite.dataset.sprite);
+      const employee = getEmployee(sprite.dataset.sprite);
+      if (employee) thought(employee, statusLine(employee));
+    });
   });
 }
 
@@ -238,7 +274,7 @@ function renderRoutes() {
     const top = Math.min(from.y, to.y);
     const width = Math.abs(from.x - to.x) || 2;
     const height = Math.abs(from.y - to.y) || 2;
-    return `<span class="route" style="left:${left}px;top:${top}px;width:${width}px;height:${height}px"></span>`;
+    return `<span class="route ${employee.status}" style="left:${left}px;top:${top}px;width:${width}px;height:${height}px"></span>`;
   }).join('');
 }
 
@@ -246,21 +282,22 @@ function renderSelectedCard() {
   const employee = getSelected();
   const activeTask = getActiveTask(employee.id);
   els.selectedCard.innerHTML = `
-    <strong>${employee.name}</strong>
-    <span>${employee.role} / ${employee.specialty}</span>
-    <small>${labelStatus(employee.status)} / Energy ${employee.energy}% / ${activeTask?.title || 'No active task'}</small>
+    <strong>${escapeHtml(employee.name)}</strong>
+    <span>${escapeHtml(employee.role)} / ${escapeHtml(employee.specialty)}</span>
+    <small>${labelStatus(employee.status)} / Energy ${employee.energy}% / ${escapeHtml(activeTask?.title || 'No active task')}</small>
+    <small>${escapeHtml(employee.thought)}</small>
   `;
 }
 
 function renderCandidates() {
   els.candidateSelect.innerHTML = candidates.map((candidate, index) => `
-    <option value="${index}">${candidate.name} - ${candidate.role} ($${candidate.salary})</option>
+    <option value="${index}">${escapeHtml(candidate.name)} - ${escapeHtml(candidate.role)} ($${candidate.salary})</option>
   `).join('');
 }
 
 function renderLog() {
   els.officeLog.innerHTML = state.log.slice(0, 40).map(entry => `
-    <div class="log-entry"><strong>${entry.time}</strong> ${entry.message}</div>
+    <div class="log-entry"><strong>${escapeHtml(entry.time)}</strong> ${escapeHtml(entry.message)}</div>
   `).join('');
 }
 
@@ -275,10 +312,11 @@ function createTask(event) {
   if (!title) return;
 
   const status = start && new Date(start) > new Date() ? 'todo' : 'doing';
-  const task = makeTask(state.nextTaskId++, title, owner, status, priority, repeat, start);
+  const task = makeTask(state.nextTaskId++, title, owner, status, priority, repeat, start, 0);
   state.tasks.push(task);
   assignTask(owner, task);
   log(`${getEmployee(owner).name} posted task board update: ${title}.`);
+  pulse(zones.board.x, zones.board.y, 'board');
   render();
 }
 
@@ -288,6 +326,7 @@ function assignTask(ownerId, task) {
   employee.task = task.title;
   employee.status = task.status === 'todo' ? 'board' : 'working';
   employee.target = task.status === 'todo' ? 'board' : 'desk';
+  thought(employee, task.status === 'todo' ? 'Posting progress' : pick(thoughtBank.working));
 }
 
 function hireAgent() {
@@ -299,8 +338,8 @@ function hireAgent() {
     return;
   }
 
-  const id = slug(candidate.name) + '-' + state.nextEmployeeId++;
-  const employee = makeEmployee(id, candidate, state.employees.length % zones.desks.length, isTemp, 'portal', '');
+  const id = `${slug(candidate.name)}-${state.nextEmployeeId++}`;
+  const employee = makeEmployee(id, candidate, state.employees.length % zones.desks.length, isTemp, 'portal', '', 'Temp onboarding');
   state.cash -= cost;
   state.employees.push(employee);
   state.selectedId = id;
@@ -311,6 +350,7 @@ function hireAgent() {
   setTimeout(() => {
     employee.status = 'resting';
     employee.target = 'rest';
+    thought(employee, 'Waiting for task');
     log(`${employee.name} has no task and moved to the rest area.`);
     render();
   }, 900);
@@ -321,11 +361,13 @@ function callSelected() {
   employee.status = 'calling';
   employee.target = 'mail';
   employee.energy = clamp(employee.energy - 4, 0, 100);
+  thought(employee, 'On voice with boss');
   const endpoint = state.systems.voiceEndpoint || 'local Azure Voice Live hook';
   log(`Voice call started with ${employee.name} through ${endpoint}.`);
   pulse(zones.mail.x, zones.mail.y, 'call');
   render();
   setTimeout(() => {
+    thought(employee, statusLine(employee));
     log(`${employee.name}: ${statusLine(employee)}`);
     employee.status = employee.task ? 'working' : 'resting';
     employee.target = employee.task ? 'desk' : 'rest';
@@ -337,6 +379,7 @@ function emailSelected() {
   const employee = getSelected();
   const body = els.messageBox.value.trim() || 'Please send a status update and next action.';
   state.mail.unshift({ to: employee.id, body, time: nowTime() });
+  thought(employee, 'Inbox updated');
   log(`Email sent to ${employee.name}: ${body}`);
   els.messageBox.value = '';
   employee.status = employee.task ? 'working' : 'resting';
@@ -347,7 +390,7 @@ function adjustSelectedTask() {
   const employee = getSelected();
   let task = getActiveTask(employee.id);
   if (!task) {
-    task = makeTask(state.nextTaskId++, 'Boss follow-up', employee.id, 'doing', 'High', 'none', '');
+    task = makeTask(state.nextTaskId++, 'Boss follow-up', employee.id, 'doing', 'High', 'none', '', 0);
     state.tasks.push(task);
   }
   const note = els.messageBox.value.trim() || 'Priority and context adjusted by boss.';
@@ -356,12 +399,15 @@ function adjustSelectedTask() {
   employee.task = task.title;
   employee.status = 'board';
   employee.target = 'board';
+  thought(employee, 'Updating board');
   log(`${employee.name} updated the task board after boss adjustment: ${note}`);
   els.messageBox.value = '';
+  pulse(zones.board.x, zones.board.y, 'board');
   render();
   setTimeout(() => {
     employee.status = 'working';
     employee.target = 'desk';
+    thought(employee, 'New plan locked');
     render();
   }, 1000);
 }
@@ -371,6 +417,7 @@ function outsourceSelected() {
   employee.status = 'outsourcing';
   employee.target = 'outsource';
   employee.energy = clamp(employee.energy - 6, 0, 100);
+  thought(employee, pick(thoughtBank.outsourcing));
   log(`${employee.name} requested Gemini / ChatGPT assistance at the outsource service desk.`);
   pulse(zones.outsource.x, zones.outsource.y, 'tool');
   render();
@@ -380,6 +427,7 @@ function completeSelectedTask() {
   const employee = getSelected();
   const task = getActiveTask(employee.id);
   if (!task) {
+    thought(employee, 'No active task');
     log(`${employee.name} has no active task to complete.`);
     return;
   }
@@ -392,6 +440,7 @@ function secretarySetup() {
   idle.forEach(employee => {
     employee.status = 'resting';
     employee.target = 'rest';
+    thought(employee, 'Waiting for task');
   });
   state.reputation += 1;
   log(`Secretary refreshed the office: ${idle.length} idle agents moved to rest, systems checked.`);
@@ -414,12 +463,31 @@ function newDay() {
     if (!getActiveTask(employee.id)) {
       employee.status = 'resting';
       employee.target = 'rest';
+      thought(employee, 'Fresh day ready');
     }
   });
   state.tasks.filter(task => task.repeat !== 'none' && task.status === 'done').forEach(task => {
-    state.tasks.push(makeTask(state.nextTaskId++, task.title, task.owner, 'todo', task.priority, task.repeat, ''));
+    state.tasks.push(makeTask(state.nextTaskId++, task.title, task.owner, 'todo', task.priority, task.repeat, '', 0));
   });
   log(`Day ${state.day} started. Recurring tasks refreshed and staff energy restored.`);
+  render();
+}
+
+function demoBeat() {
+  state.beat += 1;
+  ensureDemoTasks();
+  state.employees.forEach((employee, index) => {
+    const activeTask = getActiveTask(employee.id);
+    const cycle = ['working', 'board', 'outsourcing', 'calling', 'resting', 'working'];
+    const nextStatus = activeTask ? cycle[(state.beat + index) % cycle.length] : (index % 2 ? 'resting' : 'portal');
+    employee.status = nextStatus;
+    employee.target = targetForStatus(nextStatus);
+    employee.energy = clamp(employee.energy + (nextStatus === 'resting' ? 8 : -3), 8, 100);
+    thought(employee, pick(thoughtBank[nextStatus] || thoughtBank.working));
+  });
+  log(`Demo beat ${state.beat}: randomized agent states into an animated office scene.`);
+  pulse(zones.board.x, zones.board.y, 'board');
+  pulse(zones.portal.x, zones.portal.y, 'hire');
   render();
 }
 
@@ -437,20 +505,25 @@ function simulationTick() {
     const task = getActiveTask(employee.id);
     if (!task) {
       if (employee.status !== 'calling' && employee.status !== 'portal') {
-        employee.status = employee.energy < 95 ? 'resting' : 'resting';
+        employee.status = 'resting';
         employee.target = 'rest';
         employee.energy = clamp(employee.energy + 3, 0, 100);
+        if (Math.random() < 0.35) thought(employee, pick(thoughtBank.resting));
       }
       return;
     }
+
+    randomAgentMoment(employee, task);
 
     if (employee.status === 'working') {
       const focus = employee.specialty === 'implementation' || employee.specialty === 'review' ? 7 : 5;
       task.progress = clamp(task.progress + focus + state.speed, 0, 100);
       employee.energy = clamp(employee.energy - 2, 0, 100);
+      if (Math.random() < 0.4) thought(employee, pick(thoughtBank.working));
       if (employee.energy < 18) {
         employee.status = 'resting';
         employee.target = 'rest';
+        thought(employee, 'Need recharge');
         log(`${employee.name} got tired and went to the rest area.`);
       }
       if (task.progress >= 100) completeTask(task, employee);
@@ -458,9 +531,11 @@ function simulationTick() {
 
     if (employee.status === 'outsourcing') {
       task.progress = clamp(task.progress + 12, 0, 100);
+      if (Math.random() < 0.5) thought(employee, pick(thoughtBank.outsourcing));
       if (task.progress >= 70) {
         employee.status = 'working';
         employee.target = 'desk';
+        thought(employee, 'Tool output ready');
         log(`${employee.name} returned from the service desk with external tool output.`);
       }
     }
@@ -469,23 +544,66 @@ function simulationTick() {
   render();
 }
 
+function randomAgentMoment(employee, task) {
+  if (employee.status === 'calling' || employee.status === 'portal') return;
+  const roll = Math.random();
+  if (roll < 0.08) {
+    employee.status = 'board';
+    employee.target = 'board';
+    task.status = task.status === 'done' ? 'done' : 'doing';
+    thought(employee, pick(thoughtBank.board));
+  } else if (roll < 0.15 && employee.energy > 25) {
+    employee.status = 'outsourcing';
+    employee.target = 'outsource';
+    thought(employee, pick(thoughtBank.outsourcing));
+  } else if (roll < 0.22 && employee.energy > 35) {
+    employee.status = 'calling';
+    employee.target = 'mail';
+    thought(employee, pick(thoughtBank.calling));
+    setTimeout(() => {
+      if (employee.status === 'calling') {
+        employee.status = 'working';
+        employee.target = 'desk';
+        thought(employee, 'Call notes applied');
+        render();
+      }
+    }, 1200);
+  } else if (employee.status === 'board') {
+    employee.status = 'working';
+    employee.target = 'desk';
+  }
+}
+
 function completeTask(task, employee) {
   task.status = 'done';
   task.progress = 100;
   employee.task = '';
   employee.status = 'board';
   employee.target = 'board';
+  thought(employee, 'Done, updating board');
   const reward = task.priority === 'Critical' ? 420 : task.priority === 'High' ? 260 : 160;
   state.cash += reward;
   state.reputation += task.priority === 'Critical' ? 4 : 2;
   log(`${employee.name} completed ${task.title} and updated the task board. +$${reward}`);
+  pulse(zones.board.x, zones.board.y, 'board');
   setTimeout(() => {
     if (!getActiveTask(employee.id)) {
       employee.status = 'resting';
       employee.target = 'rest';
+      thought(employee, 'Waiting for next task');
       render();
     }
   }, 1100);
+}
+
+function ensureDemoTasks() {
+  state.employees.forEach(employee => {
+    if (getActiveTask(employee.id)) return;
+    const title = pick(taskSeeds);
+    const task = makeTask(state.nextTaskId++, title, employee.id, 'doing', pick(['Normal', 'High']), 'none', '', Math.floor(Math.random() * 35));
+    state.tasks.push(task);
+    employee.task = title;
+  });
 }
 
 function startLoop() {
@@ -529,10 +647,37 @@ function jitter(point, seed) {
   return { x: point.x + ((seed % 3) - 1) * 18, y: point.y + (seed % 2) * 14 };
 }
 
+function targetForStatus(status) {
+  return {
+    working: 'desk',
+    resting: 'rest',
+    calling: 'mail',
+    outsourcing: 'outsource',
+    board: 'board',
+    portal: 'portal'
+  }[status] || 'desk';
+}
+
 function statusLine(employee) {
   const task = getActiveTask(employee.id);
   if (!task) return 'No active task. I will stay in the rest area until assigned.';
   return `${task.title} is ${task.progress}% complete, priority ${task.priority}.`;
+}
+
+function statusIcon(status) {
+  return {
+    working: 'code',
+    resting: 'zzz',
+    calling: 'call',
+    outsourcing: 'tool',
+    board: 'plan',
+    portal: 'new'
+  }[status] || 'agent';
+}
+
+function thought(employee, message) {
+  employee.thought = message;
+  employee.thoughtTick = Date.now();
 }
 
 function pulse(x, y, type) {
@@ -544,7 +689,7 @@ function pulse(x, y, type) {
   setTimeout(() => fx.remove(), 900);
 }
 
-function makeEmployee(id, candidate, desk, temp, status, task) {
+function makeEmployee(id, candidate, desk, temp, status, task, idea = '') {
   return {
     id,
     name: candidate.name,
@@ -556,14 +701,16 @@ function makeEmployee(id, candidate, desk, temp, status, task) {
     desk,
     temp,
     status,
-    target: status,
+    target: targetForStatus(status),
     task,
+    thought: idea || pick(thoughtBank[status] || thoughtBank.working),
+    thoughtTick: Date.now(),
     energy: temp ? 82 : 100
   };
 }
 
-function makeTask(id, title, owner, status, priority, repeat, start) {
-  return { id, title, owner, status, priority, repeat, start, progress: status === 'done' ? 100 : 0 };
+function makeTask(id, title, owner, status, priority, repeat, start, progress = 0) {
+  return { id, title, owner, status, priority, repeat, start, progress: status === 'done' ? 100 : progress };
 }
 
 function labelStatus(status) {
@@ -611,10 +758,32 @@ function loadState() {
   }
 }
 
+function normalizeState(nextState) {
+  nextState.employees = nextState.employees.map((employee, index) => ({
+    ...employee,
+    desk: Number.isFinite(employee.desk) ? employee.desk : index % zones.desks.length,
+    color: employee.color || candidates[index % candidates.length].color,
+    thought: employee.thought || pick(thoughtBank[employee.status] || thoughtBank.working),
+    thoughtTick: employee.thoughtTick || Date.now(),
+    target: employee.target || targetForStatus(employee.status)
+  }));
+  nextState.tasks = nextState.tasks.map(task => ({ ...task, progress: task.progress || 0 }));
+  nextState.beat ||= 0;
+  return nextState;
+}
+
+function pick(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
 function slug(value) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[char]));
 }

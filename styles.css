@@ -511,3 +511,185 @@ menu { display: flex; justify-content: flex-end; gap: 8px; margin: 0; padding: 0
   .tabs { grid-template-columns: repeat(2, 1fr); }
   .two-col, .kanban, .button-grid { grid-template-columns: 1fr; }
 }
+
+/* Dynamic mockup layer */
+.office-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.06) 0 1px, transparent 1px 64px),
+    linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 64px);
+  mix-blend-mode: screen;
+  opacity: .22;
+  animation: officeGlow 4.8s ease-in-out infinite;
+}
+
+@keyframes officeGlow {
+  50% { opacity: .34; }
+}
+
+.zone {
+  transition: transform .18s ease, filter .18s ease, opacity .18s ease;
+}
+
+.zone:hover,
+.zone:focus-visible {
+  transform: translateY(-3px);
+  filter: brightness(1.12) drop-shadow(0 0 10px rgba(113,199,255,.45));
+  outline: 0;
+}
+
+.route {
+  animation: routeFlow 1.2s linear infinite;
+  opacity: .75;
+}
+
+.route.calling { border-color: rgba(113, 199, 255, .7); }
+.route.outsourcing { border-color: rgba(184, 149, 255, .75); }
+.route.board { border-color: rgba(255, 207, 102, .8); }
+.route.portal { border-color: rgba(255, 138, 122, .7); }
+
+@keyframes routeFlow {
+  50% { opacity: .35; transform: translateY(1px); }
+}
+
+.sprite {
+  animation: idleFloat 1.8s ease-in-out infinite;
+  will-change: left, top, transform;
+}
+
+.sprite .head::before,
+.sprite .head::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  width: 4px;
+  height: 4px;
+  background: #102131;
+}
+
+.sprite .head::before { left: 5px; }
+.sprite .head::after { right: 5px; }
+
+.sprite .body::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 9px;
+  width: 20px;
+  height: 4px;
+  background: rgba(16,33,49,.45);
+  box-shadow: 0 9px rgba(16,33,49,.25);
+}
+
+.sprite.working { animation: workingStep .8s steps(2) infinite; }
+.sprite.resting { animation: restBreath 2.4s ease-in-out infinite; }
+.sprite.calling { animation: callBounce .55s steps(2) infinite; }
+.sprite.outsourcing { animation: toolPulse .9s ease-in-out infinite; }
+.sprite.board { animation: boardNod .8s steps(2) infinite; }
+.sprite.portal { animation: portalPop .75s ease infinite alternate; }
+
+.thought-bubble {
+  position: absolute;
+  left: 50%;
+  bottom: 84px;
+  z-index: 2;
+  width: max-content;
+  max-width: 132px;
+  min-height: 24px;
+  padding: 5px 7px;
+  transform: translateX(-50%);
+  border: 2px solid #102131;
+  background: #f6fbff;
+  color: #122230;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.2;
+  white-space: normal;
+  box-shadow: 0 4px 0 rgba(16,33,49,.4);
+  animation: bubblePop 1.8s ease-in-out infinite;
+}
+
+.thought-bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 10px;
+  height: 10px;
+  transform: translateX(-50%) rotate(45deg);
+  border-right: 2px solid #102131;
+  border-bottom: 2px solid #102131;
+  background: #f6fbff;
+}
+
+.status-icon {
+  position: absolute;
+  right: -21px;
+  top: 24px;
+  z-index: 3;
+  min-width: 32px;
+  padding: 3px 4px;
+  border: 2px solid #102131;
+  background: var(--gold);
+  color: #102131;
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 0 3px 0 #0b151d;
+}
+
+.sprite.resting .status-icon { background: #9bb0c2; }
+.sprite.calling .status-icon { background: var(--blue); }
+.sprite.outsourcing .status-icon { background: #b895ff; }
+.sprite.board .status-icon { background: var(--gold); }
+.sprite.portal .status-icon { background: var(--red); }
+
+.wide-button { grid-column: 1 / -1; }
+
+.pulse.board { border-color: var(--gold); }
+.pulse.setup { border-color: var(--accent); }
+
+@keyframes idleFloat {
+  50% { transform: translate(-50%, calc(-50% - 2px)); }
+}
+
+@keyframes workingStep {
+  50% { transform: translate(-50%, calc(-50% - 3px)); }
+}
+
+@keyframes restBreath {
+  50% { transform: translate(-50%, calc(-50% + 2px)); opacity: .72; }
+}
+
+@keyframes callBounce {
+  50% { transform: translate(calc(-50% + 2px), -50%); }
+}
+
+@keyframes toolPulse {
+  50% { transform: translate(-50%, calc(-50% - 3px)) scale(1.04); }
+}
+
+@keyframes boardNod {
+  50% { transform: translate(-50%, calc(-50% + 2px)); }
+}
+
+@keyframes bubblePop {
+  50% { transform: translateX(-50%) translateY(-3px); }
+}
+
+@media (max-width: 720px) {
+  .thought-bubble {
+    max-width: 96px;
+    font-size: 9px;
+  }
+
+  .status-icon {
+    right: -14px;
+    min-width: 26px;
+    font-size: 8px;
+  }
+}
