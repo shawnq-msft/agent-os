@@ -794,3 +794,17 @@ menu { display: flex; justify-content: flex-end; gap: 8px; margin: 0; padding: 0
 @keyframes spritePortal {
   50% { filter: hue-rotate(18deg) drop-shadow(0 0 9px #2bd1ff); }
 }
+
+#gameCanvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #203442;
+}
+
+#gameCanvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+  image-rendering: pixelated;
+}

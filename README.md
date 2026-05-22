@@ -22,6 +22,20 @@ node scripts/generate-image-assets.mjs
 
 Generated files are saved under `assets/generated/` and can be swapped into the UI.
 
+
+## Phaser Runtime And Azure Layer Assets
+
+The current runtime uses Phaser 3 for the office scene. It renders an Azure `gpt-image-2` empty-office base layer plus Azure-generated prop and agent sprite sheets. Chroma-key post-processing creates transparent PNG sheets for Phaser sprites.
+
+```powershell
+node scripts/generate-phaser-assets.mjs
+```
+
+Generated Phaser assets:
+
+- `assets/generated/phaser-empty-office.png`
+- `assets/generated/phaser-props-transparent.png`
+- `assets/generated/phaser-agents-transparent.png`
 ## Generate Demo Layer Assets
 
 The playable demo currently uses Azure `gpt-image-2` for the main office background in `assets/generated/office-background.png`. The transparent furniture layers and fixed-grid sprite sheet are deterministic engineering mock assets for collision, routing, and animation testing; they are not Azure image generations. Regenerate those deterministic assets with:

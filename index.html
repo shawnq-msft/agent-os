@@ -22,7 +22,7 @@
         </header>
 
         <div class="office-stage" id="officeStage">
-          <img class="asset-bg" src="assets/generated/office-background.png" alt="Azure generated pixel office background" onerror="this.onerror=null;this.src='assets/office-background.svg';" />
+          <div id="gameCanvas" aria-label="Phaser office scene"></div>
 
           <button class="zone board-zone" id="boardZone" type="button">
             <span>Task Board</span>
@@ -48,11 +48,6 @@
             <span>Rest Area</span>
             <small id="restSummary">0 idle</small>
           </div>
-
-          <div class="prop-layer" id="propLayer" aria-label="Office prop layers"></div>
-          <div class="route-layer" id="routeLayer" aria-hidden="true"></div>
-          <div class="sprite-layer" id="spriteLayer" aria-label="Agent employees"></div>
-          <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
         </div>
       </section>
 
@@ -184,6 +179,7 @@
       </form>
     </dialog>
 
-    <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+    <script src="app-phaser.js"></script>
   </body>
 </html>
