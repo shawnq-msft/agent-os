@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" role="img" aria-label="Agent office pixel background">
+  <defs>
+    <pattern id="floor" width="48" height="48" patternUnits="userSpaceOnUse">
+      <rect width="48" height="48" fill="#3f5b68"/>
+      <path d="M48 0H0v48" fill="none" stroke="#567585" stroke-width="2" opacity="0.55"/>
+      <path d="M0 24h48M24 0v48" fill="none" stroke="#496877" stroke-width="1" opacity="0.35"/>
+    </pattern>
+    <pattern id="wallDots" width="18" height="18" patternUnits="userSpaceOnUse">
+      <rect width="18" height="18" fill="#24384a"/>
+      <rect x="2" y="2" width="2" height="2" fill="#2f465a"/>
+    </pattern>
+  </defs>
+  <rect width="960" height="210" fill="url(#wallDots)"/>
+  <rect y="210" width="960" height="510" fill="url(#floor)"/>
+  <rect y="196" width="960" height="18" fill="#152634"/>
+  <g stroke="#102131" stroke-width="5">
+    <rect x="42" y="28" width="156" height="120" fill="#95d4ff"/>
+    <rect x="220" y="28" width="156" height="120" fill="#8ac9f2"/>
+    <rect x="584" y="28" width="156" height="120" fill="#95d4ff"/>
+    <rect x="762" y="28" width="156" height="120" fill="#8ac9f2"/>
+    <path d="M120 28v120M42 88h156M298 28v120M220 88h156M662 28v120M584 88h156M840 28v120M762 88h156"/>
+  </g>
+  <g fill="#5e9bc2" opacity="0.7">
+    <rect x="62" y="112" width="36" height="36"/>
+    <rect x="116" y="92" width="54" height="56"/>
+    <rect x="242" y="102" width="46" height="46"/>
+    <rect x="304" y="76" width="42" height="72"/>
+    <rect x="606" y="104" width="58" height="44"/>
+    <rect x="682" y="78" width="36" height="70"/>
+    <rect x="784" y="96" width="46" height="52"/>
+    <rect x="848" y="70" width="42" height="78"/>
+  </g>
+  <g>
+    <rect x="408" y="52" width="144" height="66" rx="0" fill="#f4f8ff" stroke="#102131" stroke-width="5"/>
+    <rect x="428" y="72" width="22" height="22" fill="#64d2a6"/>
+    <rect x="456" y="72" width="22" height="22" fill="#ffcf66"/>
+    <rect x="484" y="72" width="22" height="22" fill="#71c7ff"/>
+    <rect x="512" y="72" width="22" height="22" fill="#ff8a7a"/>
+  </g>
+  <g fill="#284355" opacity="0.65">
+    <rect x="16" y="672" width="64" height="20"/>
+    <rect x="102" y="624" width="54" height="18"/>
+    <rect x="850" y="642" width="74" height="18"/>
+    <rect x="782" y="248" width="54" height="18"/>
+  </g>
+</svg>

@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent OS Office RPG</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell" aria-label="Agent OS office RPG">
+      <section class="office-wrap" aria-label="Office simulation">
+        <header class="hud">
+          <div>
+            <p>Agent OS</p>
+            <h1>Office RPG</h1>
+          </div>
+          <div class="hud-stats">
+            <span id="cashStat">Cash $0</span>
+            <span id="repStat">Rep 0</span>
+            <span id="dayStat">Day 1</span>
+          </div>
+        </header>
+
+        <div class="office-stage" id="officeStage">
+          <img class="asset-bg" src="assets/generated/office-background.png" alt="Pixel office background" onerror="this.onerror=null;this.src='assets/office-background.svg';" />
+
+          <button class="zone board-zone" id="boardZone" type="button">
+            <span>Task Board</span>
+            <small id="boardSummary">0 active</small>
+          </button>
+
+          <button class="zone portal-zone" id="portalZone" type="button">
+            <span>Agent Portal</span>
+            <small>Temp staff</small>
+          </button>
+
+          <button class="zone outsource-zone" id="outsourceZone" type="button">
+            <span>Service Desk</span>
+            <small>Tools</small>
+          </button>
+
+          <button class="zone secretary-zone" id="secretaryZone" type="button">
+            <span>Secretary</span>
+            <small>Setup</small>
+          </button>
+
+          <div class="zone rest-zone" aria-label="Rest area">
+            <span>Rest Area</span>
+            <small id="restSummary">0 idle</small>
+          </div>
+
+          <div class="desk-layer" id="deskLayer" aria-label="Employee desks"></div>
+          <div class="route-layer" id="routeLayer" aria-hidden="true"></div>
+          <div class="sprite-layer" id="spriteLayer" aria-label="Agent employees"></div>
+          <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <aside class="boss-console" aria-label="Boss console">
+        <nav class="tabs" aria-label="Console tabs">
+          <button class="tab active" data-tab="team" type="button">Team</button>
+          <button class="tab" data-tab="tasks" type="button">Tasks</button>
+          <button class="tab" data-tab="mail" type="button">Mail</button>
+          <button class="tab" data-tab="systems" type="button">Systems</button>
+        </nav>
+
+        <section class="tab-panel active" id="teamPanel">
+          <div class="panel-title">
+            <h2>Employees</h2>
+            <button class="small-button" id="hireButton" type="button">Hire</button>
+          </div>
+          <div class="employee-list" id="employeeList"></div>
+        </section>
+
+        <section class="tab-panel" id="tasksPanel">
+          <div class="panel-title">
+            <h2>Task Board</h2>
+            <button class="small-button" id="completeTaskButton" type="button">Complete</button>
+          </div>
+          <form class="task-form" id="taskForm">
+            <label>
+              Task
+              <input id="taskTitle" name="title" type="text" value="Prepare weekly roadmap" required />
+            </label>
+            <div class="two-col">
+              <label>
+                Owner
+                <select id="taskOwner" name="owner"></select>
+              </label>
+              <label>
+                Priority
+                <select id="taskPriority" name="priority">
+                  <option>Normal</option>
+                  <option>High</option>
+                  <option>Critical</option>
+                </select>
+              </label>
+            </div>
+            <div class="two-col">
+              <label>
+                Starts
+                <input id="taskStart" name="start" type="datetime-local" />
+              </label>
+              <label>
+                Repeat
+                <select id="taskRepeat" name="repeat">
+                  <option value="none">None</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </label>
+            </div>
+            <button class="primary-button" type="submit">Create Task</button>
+          </form>
+          <div class="kanban" id="kanban"></div>
+        </section>
+
+        <section class="tab-panel" id="mailPanel">
+          <div class="panel-title">
+            <h2>Call And Mail</h2>
+            <button class="small-button" id="clearMessageButton" type="button">Clear</button>
+          </div>
+          <div class="selected-card" id="selectedCard">Select an employee</div>
+          <textarea id="messageBox" rows="5" placeholder="Ask for status, provide context, or adjust a task"></textarea>
+          <div class="button-grid">
+            <button class="small-button" id="callButton" type="button">Voice Call</button>
+            <button class="small-button" id="emailButton" type="button">Email</button>
+            <button class="small-button" id="adjustButton" type="button">Adjust Task</button>
+            <button class="small-button" id="outsourceButton" type="button">Use Tools</button>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="systemsPanel">
+          <div class="panel-title">
+            <h2>Systems</h2>
+            <button class="small-button" id="saveButton" type="button">Save</button>
+          </div>
+          <label>
+            Azure Voice Live endpoint
+            <input id="voiceEndpoint" type="url" placeholder="https://your-voice-live-endpoint" />
+          </label>
+          <label>
+            Email workspace
+            <input id="emailWorkspace" type="email" placeholder="boss@agent-os.local" />
+          </label>
+          <label>
+            Simulation speed
+            <input id="speedSlider" type="range" min="1" max="5" value="3" />
+          </label>
+          <div class="button-grid">
+            <button class="small-button" id="secretarySetupButton" type="button">Secretary Setup</button>
+            <button class="small-button" id="resetButton" type="button">New Day</button>
+          </div>
+          <div class="asset-note">
+            <strong>Assets</strong>
+            <span>Background, prop zones, and sprites are separate layers for movement and animation.</span>
+          </div>
+        </section>
+
+        <section class="log-panel">
+          <h2>Office Log</h2>
+          <div class="office-log" id="officeLog"></div>
+        </section>
+      </aside>
+    </main>
+
+    <dialog id="hireDialog">
+      <form method="dialog" class="dialog-card" id="hireForm">
+        <h2>Hire Agent</h2>
+        <label>
+          Candidate
+          <select id="candidateSelect"></select>
+        </label>
+        <label class="check-row">
+          <input id="tempHire" type="checkbox" />
+          Temporary agent from portal
+        </label>
+        <menu>
+          <button value="cancel" type="submit">Cancel</button>
+          <button class="primary-button" id="confirmHireButton" value="default" type="button">Hire</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
