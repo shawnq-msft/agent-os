@@ -24,7 +24,7 @@ Generated files are saved under `assets/generated/` and can be swapped into the 
 
 ## Generate Demo Layer Assets
 
-The playable demo uses a clean empty-room layer, transparent furniture layers, and a fixed-grid transparent agent sprite sheet. Regenerate those deterministic assets with:
+The playable demo currently uses Azure `gpt-image-2` for the main office background in `assets/generated/office-background.png`. The transparent furniture layers and fixed-grid sprite sheet are deterministic engineering mock assets for collision, routing, and animation testing; they are not Azure image generations. Regenerate those deterministic assets with:
 
 ```powershell
 node scripts/generate-vector-assets.mjs
