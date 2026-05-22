@@ -1,17 +1,120 @@
 {
-  "source": "assets/generated/office-background.png",
-  "stage": { "width": 960, "height": 720, "sourceCropY": 120 },
+  "source": "assets/layers/empty-office.svg",
+  "spriteSheet": "assets/sprites/agent-sprite-sheet.svg",
+  "stage": {
+    "width": 960,
+    "height": 720
+  },
   "layers": [
-    { "id": "task-board", "label": "Task Board", "x": 28, "y": 214, "w": 252, "h": 162, "solid": true },
-    { "id": "agent-portal", "label": "Agent Portal", "x": 768, "y": 220, "w": 174, "h": 126, "solid": true },
-    { "id": "service-desk", "label": "Service Desk", "x": 724, "y": 478, "w": 184, "h": 124, "solid": true },
-    { "id": "secretary-station", "label": "Secretary", "x": 52, "y": 420, "w": 194, "h": 116, "solid": true },
-    { "id": "rest-area", "label": "Rest Area", "x": 34, "y": 572, "w": 260, "h": 112, "solid": false },
-    { "id": "desk-1", "label": "Desk 1", "x": 352, "y": 274, "w": 156, "h": 124, "solid": true },
-    { "id": "desk-2", "label": "Desk 2", "x": 562, "y": 274, "w": 156, "h": 124, "solid": true },
-    { "id": "desk-3", "label": "Desk 3", "x": 352, "y": 462, "w": 156, "h": 124, "solid": true },
-    { "id": "desk-4", "label": "Desk 4", "x": 562, "y": 462, "w": 156, "h": 124, "solid": true },
-    { "id": "desk-5", "label": "Desk 5", "x": 694, "y": 332, "w": 156, "h": 124, "solid": true },
-    { "id": "desk-6", "label": "Desk 6", "x": 218, "y": 466, "w": 156, "h": 124, "solid": true }
+    {
+      "id": "task-board",
+      "label": "Task Board",
+      "x": 28,
+      "y": 214,
+      "w": 252,
+      "h": 162,
+      "solid": true,
+      "asset": "assets/layers/task-board.svg"
+    },
+    {
+      "id": "agent-portal",
+      "label": "Agent Portal",
+      "x": 768,
+      "y": 220,
+      "w": 174,
+      "h": 126,
+      "solid": true,
+      "asset": "assets/layers/agent-portal.svg"
+    },
+    {
+      "id": "service-desk",
+      "label": "Service Desk",
+      "x": 724,
+      "y": 478,
+      "w": 184,
+      "h": 124,
+      "solid": true,
+      "asset": "assets/layers/service-desk.svg"
+    },
+    {
+      "id": "secretary-station",
+      "label": "Secretary",
+      "x": 52,
+      "y": 420,
+      "w": 194,
+      "h": 116,
+      "solid": true,
+      "asset": "assets/layers/secretary-station.svg"
+    },
+    {
+      "id": "rest-area",
+      "label": "Rest Area",
+      "x": 34,
+      "y": 572,
+      "w": 260,
+      "h": 112,
+      "solid": false,
+      "asset": "assets/layers/rest-area.svg"
+    },
+    {
+      "id": "desk-1",
+      "label": "Desk 1",
+      "x": 352,
+      "y": 274,
+      "w": 156,
+      "h": 124,
+      "solid": true,
+      "asset": "assets/layers/desk-1.svg"
+    },
+    {
+      "id": "desk-2",
+      "label": "Desk 2",
+      "x": 562,
+      "y": 274,
+      "w": 156,
+      "h": 124,
+      "solid": true,
+      "asset": "assets/layers/desk-2.svg"
+    },
+    {
+      "id": "desk-3",
+      "label": "Desk 3",
+      "x": 352,
+      "y": 462,
+      "w": 156,
+      "h": 124,
+      "solid": true,
+      "asset": "assets/layers/desk-3.svg"
+    },
+    {
+      "id": "desk-4",
+      "label": "Desk 4",
+      "x": 562,
+      "y": 462,
+      "w": 156,
+      "h": 124,
+      "solid": true,
+      "asset": "assets/layers/desk-4.svg"
+    },
+    {
+      "id": "desk-5",
+      "label": "Desk 5",
+      "x": 694,
+      "y": 332,
+      "w": 156,
+      "h": 124,
+      "solid": true,
+      "asset": "assets/layers/desk-5.svg"
+    },
+    {
+      "id": "desk-6",
+      "label": "Desk 6",
+      "x": 218,
+      "y": 466,
+      "w": 156,
+      "h": 124,
+      "solid": true,
+      "asset": "assets/layers/desk-6.svg"
+    }
   ]
 }

@@ -741,8 +741,8 @@ menu { display: flex; justify-content: flex-end; gap: 8px; margin: 0; padding: 0
   width: 48px;
   height: 64px;
   transform: translateX(-50%);
-  background-image: url("assets/generated/agent-sprite-sheet.png"), linear-gradient(var(--agent), var(--agent));
-  background-size: 288px 384px, auto;
+  background-image: url("assets/sprites/agent-sprite-sheet.svg"), linear-gradient(var(--agent), var(--agent));
+  background-size: 144px 320px, auto;
   background-position: var(--sprite-x) var(--sprite-y), center;
   border: 0;
   image-rendering: pixelated;

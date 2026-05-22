@@ -21,3 +21,13 @@ node scripts/generate-image-assets.mjs
 ```
 
 Generated files are saved under `assets/generated/` and can be swapped into the UI.
+
+## Generate Demo Layer Assets
+
+The playable demo uses a clean empty-room layer, transparent furniture layers, and a fixed-grid transparent agent sprite sheet. Regenerate those deterministic assets with:
+
+```powershell
+node scripts/generate-vector-assets.mjs
+```
+
+The older `scripts/extract-office-layers.mjs` script can crop layers from a generated raster background, but those crops are not transparent enough for the current interactive layer model.

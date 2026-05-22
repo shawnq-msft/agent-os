@@ -1,19 +1,19 @@
-const STORAGE_KEY = 'agent-os-office-rpg-v3';
+const STORAGE_KEY = 'agent-os-office-rpg-v4';
 
 const zones = {
   desks: [
-    { x: 430, y: 336 },
-    { x: 640, y: 336 },
-    { x: 430, y: 524 },
-    { x: 640, y: 524 },
-    { x: 772, y: 394 },
-    { x: 296, y: 528 }
+    { x: 430, y: 414 },
+    { x: 640, y: 414 },
+    { x: 430, y: 604 },
+    { x: 640, y: 604 },
+    { x: 872, y: 424 },
+    { x: 296, y: 624 }
   ],
-  board: { x: 162, y: 342 },
+  board: { x: 316, y: 342 },
   rest: { x: 164, y: 610 },
-  outsource: { x: 824, y: 552 },
-  portal: { x: 822, y: 304 },
-  secretary: { x: 150, y: 462 },
+  outsource: { x: 682, y: 552 },
+  portal: { x: 722, y: 304 },
+  secretary: { x: 284, y: 474 },
   mail: { x: 522, y: 222 }
 };
 
@@ -209,7 +209,7 @@ function renderHud() {
 
 function renderProps() {
   els.propLayer.innerHTML = propLayers.map(layer => `
-    <img class="prop prop-${layer.id}" src="assets/layers/${layer.id}.png" alt="${escapeHtml(layer.label)}"
+    <img class="prop prop-${layer.id}" src="assets/layers/${layer.id}.svg" alt="${escapeHtml(layer.label)}"
       style="left:${layer.x}px;top:${layer.y}px;width:${layer.w}px;height:${layer.h}px" />
   `).join('');
 }
@@ -577,16 +577,16 @@ function simulationTick() {
 function randomAgentMoment(employee, task) {
   if (employee.status === 'calling' || employee.status === 'portal') return;
   const roll = Math.random();
-  if (roll < 0.08) {
+  if (roll < 0.18) {
     employee.status = 'board';
     employee.target = 'board';
     task.status = task.status === 'done' ? 'done' : 'doing';
     thought(employee, pick(thoughtBank.board));
-  } else if (roll < 0.15 && employee.energy > 25) {
+  } else if (roll < 0.36 && employee.energy > 25) {
     employee.status = 'outsourcing';
     employee.target = 'outsource';
     thought(employee, pick(thoughtBank.outsourcing));
-  } else if (roll < 0.22 && employee.energy > 35) {
+  } else if (roll < 0.5 && employee.energy > 35) {
     employee.status = 'calling';
     employee.target = 'mail';
     thought(employee, pick(thoughtBank.calling));
