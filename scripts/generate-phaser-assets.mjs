@@ -28,12 +28,13 @@ const assets = [
     size: '1024x1024',
     prompt: [
       'Use case: game assets.',
-      'Asset type: strict 4 by 4 pixel art office prop sprite sheet for a Phaser game.',
-      'Primary request: sixteen isolated office props matching the Agent OS pixel office style: employee desk, task board, agent portal, outsource service desk, secretary station, rest sofa, coffee table, plant, storage boxes, water cooler, server vending machine, wall screen, shelf, rug, small robot terminal, floor lamp.',
-      'Composition/framing: exact 4 columns by 4 rows grid, each cell 256 by 256 pixels, one centered prop per cell, equal padding, no props touching cell borders.',
+      'Asset type: strict 4 by 4 pixel art office prop sprite sheet for a Phaser office RPG.',
+      'Primary request: sixteen isolated office props matching the Agent OS Azure pixel office style: employee desk, task board, agent portal, outsource service desk, secretary station, rest sofa, coffee table, plant, storage boxes, water cooler, server vending machine, wall screen, shelf, rug, small robot terminal, floor lamp.',
+      'Composition/framing: exact 4 columns by 4 rows grid, each cell 256 by 256 pixels. One prop per cell, centered horizontally with its floor contact point near the lower middle of the cell. Leave equal padding and keep every prop fully inside its cell.',
+      'Perspective: consistent top-down three-quarter RPG perspective, camera about 45 degrees above the floor. All props must share the same scale, angle, floor contact, lighting direction, and pixel density. Desks and sofa should look like they sit on the floor, not front-facing icons.',
       'Background: flat pure chroma green #00FF00 only, to be removed by post-processing.',
-      'Style/medium: polished crisp pixel art, same perspective and lighting as the office background.',
-      'Constraints: no text, no watermark, no shadows crossing cells, no full room background, no labels.'
+      'Style/medium: polished crisp pixel art, same palette and lighting as the Azure generated office background.',
+      'Constraints: no text, no watermark, no shadows crossing cells, no full room background, no labels, no front-view catalog icons.'
     ].join('\n')
   },
   {
@@ -42,12 +43,14 @@ const assets = [
     size: '1024x1536',
     prompt: [
       'Use case: game assets.',
-      'Asset type: strict agent character sprite sheet for a Phaser office RPG.',
-      'Primary request: six small AI agent employees as full-body pixel art sprites: Codex coder, Hermes operations agent, Claude Code reviewer, Open Claw tool runner, secretary assistant, temporary portal agent.',
-      'Composition/framing: exact 4 columns by 6 rows grid, each cell 256 by 256 pixels. Each row is one character. Columns are idle front, walk left foot, walk right foot, using device or phone. One centered full-body sprite per cell, equal padding.',
+      'Asset type: strict chibi big-head agent character sprite sheet for a Phaser office RPG.',
+      'Primary request: six AI agent employees as cute chibi big-head pixel art sprites: Codex coder, Hermes operations agent, Claude Code reviewer, Open Claw tool runner, secretary assistant, temporary portal agent.',
+      'Character proportions: large expressive head about 55 to 60 percent of total character height, small body, short legs, readable face, office outfit, game mascot style. Characters should feel like big-head RPG sprites, not realistic adults.',
+      'Composition/framing: exact 4 columns by 6 rows grid, each cell 256 by 256 pixels. Each row is one character. Columns are idle front, walk left foot, walk right foot, using device or phone. One centered full-body sprite per cell, feet near lower middle of the cell, equal padding.',
+      'Perspective: same top-down three-quarter RPG perspective as the office, consistent scale across every frame and row, same lighting and pixel density.',
       'Background: flat pure chroma green #00FF00 only, to be removed by post-processing.',
-      'Style/medium: crisp readable pixel art sprites, office outfits, same scale and lighting across frames.',
-      'Constraints: no text, no watermark, no complex background, no overlapping characters, no frame borders.'
+      'Style/medium: crisp readable pixel art, bright tech office RPG, cute chibi mascot proportions.',
+      'Constraints: no text, no watermark, no complex background, no overlapping characters, no frame borders, no realistic human proportions.'
     ].join('\n')
   }
 ];

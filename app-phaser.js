@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'agent-os-phaser-rpg-v1';
+const STORAGE_KEY = 'agent-os-phaser-rpg-v2';
 const GAME_W = 960;
 const GAME_H = 720;
 const CELL = 48;
@@ -126,7 +126,7 @@ class OfficeScene extends Phaser.Scene {
     gameScene = this;
     this.add.image(GAME_W / 2, GAME_H / 2, 'office-empty').setDisplaySize(GAME_W, GAME_H);
     props.forEach(prop => {
-      this.add.image(prop.x, prop.y, 'props', prop.frame).setDisplaySize(prop.w, prop.h).setDepth(prop.y);
+      this.add.image(prop.x, prop.y, 'props', prop.frame).setOrigin(0.5, 0.86).setDisplaySize(prop.w, prop.h).setDepth(prop.y);
     });
     this.routeGraphics = this.add.graphics().setDepth(1000);
     state.employees.forEach(employee => this.createAgent(employee));
@@ -137,16 +137,16 @@ class OfficeScene extends Phaser.Scene {
 
   createAgent(employee) {
     const container = this.add.container(0, 0).setDepth(2000);
-    const shadow = this.add.ellipse(0, 30, 46, 14, 0x050a0f, 0.35);
-    const sprite = this.add.sprite(0, 0, 'agents', employee.row * 4).setDisplaySize(56, 56);
-    const bubble = this.add.text(0, -54, employee.thought, {
+    const shadow = this.add.ellipse(0, 26, 54, 16, 0x050a0f, 0.35);
+    const sprite = this.add.sprite(0, 0, 'agents', employee.row * 4).setOrigin(0.5, 0.92).setDisplaySize(78, 78);
+    const bubble = this.add.text(0, -76, employee.thought, {
       fontFamily: 'monospace', fontSize: '11px', color: '#122230', backgroundColor: '#f6fbff', padding: { x: 5, y: 3 }, align: 'center'
     }).setOrigin(0.5).setStroke('#102131', 2);
-    const label = this.add.text(0, 48, employee.name, {
+    const label = this.add.text(0, 44, employee.name, {
       fontFamily: 'monospace', fontSize: '10px', color: '#edf6ff', backgroundColor: 'rgba(13,20,28,.82)', padding: { x: 4, y: 2 }
     }).setOrigin(0.5);
     container.add([shadow, sprite, bubble, label]);
-    container.setSize(56, 76).setInteractive({ useHandCursor: true }).on('pointerdown', () => selectEmployee(employee.id));
+    container.setSize(78, 92).setInteractive({ useHandCursor: true }).on('pointerdown', () => selectEmployee(employee.id));
     this.agentSprites.set(employee.id, { container, sprite, bubble, route: [] });
   }
 
