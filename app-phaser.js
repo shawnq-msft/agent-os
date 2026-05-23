@@ -1,39 +1,58 @@
-const STORAGE_KEY = 'agent-os-phaser-rpg-v2';
+const STORAGE_KEY = 'agent-os-phaser-rpg-v3';
 const GAME_W = 960;
 const GAME_H = 720;
 const CELL = 48;
 
+function tile(col, row) {
+  return { x: col * CELL + CELL / 2, y: row * CELL + CELL / 2 };
+}
+
+function prop(frame, col, row, wCells, hCells, solid = true) {
+  return {
+    frame,
+    col,
+    row,
+    wCells,
+    hCells,
+    x: col * CELL + (wCells * CELL) / 2,
+    y: row * CELL + (hCells * CELL) / 2,
+    w: wCells * CELL,
+    h: hCells * CELL,
+    solid
+  };
+}
+
 const zones = {
   desks: [
-    { x: 430, y: 414 },
-    { x: 640, y: 414 },
-    { x: 430, y: 604 },
-    { x: 640, y: 604 },
-    { x: 872, y: 424 },
-    { x: 296, y: 624 }
+    tile(8, 7),
+    tile(12, 7),
+    tile(8, 11),
+    tile(12, 11),
+    tile(16, 8),
+    tile(5, 11)
   ],
-  board: { x: 316, y: 342 },
-  rest: { x: 164, y: 610 },
-  outsource: { x: 682, y: 552 },
-  portal: { x: 722, y: 304 },
-  secretary: { x: 284, y: 474 },
-  mail: { x: 522, y: 222 }
+  board: tile(5, 5),
+  rest: tile(3, 12),
+  outsource: tile(14, 11),
+  portal: tile(15, 5),
+  secretary: tile(4, 9),
+  mail: tile(10, 4)
 };
 
 const props = [
-  { key: 'desk', frame: 0, x: 430, y: 336, w: 156, h: 124, solid: true },
-  { key: 'desk', frame: 0, x: 640, y: 336, w: 156, h: 124, solid: true },
-  { key: 'desk', frame: 0, x: 430, y: 524, w: 156, h: 124, solid: true },
-  { key: 'desk', frame: 0, x: 640, y: 524, w: 156, h: 124, solid: true },
-  { key: 'desk', frame: 0, x: 772, y: 394, w: 156, h: 124, solid: true },
-  { key: 'desk', frame: 0, x: 296, y: 528, w: 156, h: 124, solid: true },
-  { key: 'task-board', frame: 1, x: 154, y: 296, w: 252, h: 162, solid: true },
-  { key: 'portal', frame: 2, x: 855, y: 284, w: 174, h: 126, solid: true },
-  { key: 'service-desk', frame: 3, x: 816, y: 540, w: 184, h: 124, solid: true },
-  { key: 'secretary', frame: 4, x: 149, y: 478, w: 194, h: 116, solid: true },
-  { key: 'rest', frame: 5, x: 164, y: 628, w: 260, h: 112, solid: false },
-  { key: 'plant', frame: 7, x: 72, y: 188, w: 72, h: 90, solid: true },
-  { key: 'water', frame: 9, x: 900, y: 200, w: 64, h: 96, solid: true }
+  prop(0, 7, 6, 3, 2),
+  prop(0, 11, 6, 3, 2),
+  prop(0, 7, 10, 3, 2),
+  prop(0, 11, 10, 3, 2),
+  prop(0, 15, 7, 3, 2),
+  prop(0, 4, 10, 3, 2),
+  prop(1, 2, 3, 4, 2),
+  prop(2, 16, 3, 3, 2),
+  prop(3, 15, 10, 3, 2),
+  prop(4, 2, 8, 3, 2),
+  prop(5, 1, 12, 4, 2, false),
+  prop(7, 1, 3, 1, 2),
+  prop(9, 18, 3, 1, 2)
 ];
 
 const candidates = [
@@ -113,7 +132,7 @@ class OfficeScene extends Phaser.Scene {
     super('office');
     this.agentSprites = new Map();
     this.routeGraphics = null;
-    this.obstacles = props.filter(item => item.solid).map(item => ({ x: item.x - item.w / 2, y: item.y - item.h / 2, w: item.w, h: item.h }));
+    this.obstacles = props.filter(item => item.solid).map(item => ({ x: item.col * CELL, y: item.row * CELL, w: item.w, h: item.h }));
   }
 
   preload() {
@@ -126,7 +145,7 @@ class OfficeScene extends Phaser.Scene {
     gameScene = this;
     this.add.image(GAME_W / 2, GAME_H / 2, 'office-empty').setDisplaySize(GAME_W, GAME_H);
     props.forEach(prop => {
-      this.add.image(prop.x, prop.y, 'props', prop.frame).setOrigin(0.5, 0.86).setDisplaySize(prop.w, prop.h).setDepth(prop.y);
+      this.add.image(prop.x, prop.y, 'props', prop.frame).setOrigin(0.5).setDisplaySize(prop.w, prop.h).setDepth(prop.y);
     });
     this.routeGraphics = this.add.graphics().setDepth(1000);
     state.employees.forEach(employee => this.createAgent(employee));
@@ -501,7 +520,8 @@ function getPosition(employee) {
   if (employee.status === 'working') return queuePoint(zones.desks[employee.desk % zones.desks.length], index, 36, 28);
   return queuePoint(target, index, 44, 28);
 }
-function queuePoint(point, seed, gapX, gapY) { return { x: point.x + ((seed % 4) - 1.5) * gapX, y: point.y + (Math.floor(seed / 4) % 2) * gapY }; }
+function queuePoint(point, seed, gapX, gapY) { return snapToTile({ x: point.x + ((seed % 3) - 1) * gapX, y: point.y + (Math.floor(seed / 3) % 2) * gapY }); }
+function snapToTile(point) { return tile(clamp(Math.round(point.x / CELL - 0.5), 0, GAME_W / CELL - 1), clamp(Math.round(point.y / CELL - 0.5), 0, GAME_H / CELL - 1)); }
 function queueIndex(employee) { const target = targetForStatus(employee.status); return state.employees.filter(item => targetForStatus(item.status) === target).findIndex(item => item.id === employee.id); }
 function targetForStatus(status) { return { working: 'desk', resting: 'rest', calling: 'mail', outsourcing: 'outsource', board: 'board', portal: 'portal' }[status] || 'desk'; }
 function frameForStatus(status) { return status === 'calling' || status === 'outsourcing' ? 3 : status === 'resting' ? 0 : status === 'board' ? 2 : Math.random() > 0.5 ? 1 : 2; }

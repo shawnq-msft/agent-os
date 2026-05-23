@@ -17,8 +17,8 @@ const assets = [
       'Use case: game assets.',
       'Asset type: empty 2D pixel art office background for a Phaser office RPG.',
       'Primary request: recreate the same layout style as the existing Agent OS generated office, but show only the empty room: blue-gray carpet tile floor, upper window wall with city skyline, clean walkable office floor, wall lighting, no furniture, no desks, no task board, no portal, no service desk, no sofa, no characters.',
-      'Composition/framing: top-down three-quarter RPG office view, 4:3 landscape game background, clear open floor paths, same perspective as a furnished agent office.',
-      'Style/medium: polished crisp pixel art, bright professional tech-office mood, game-ready background.',
+      'Composition/framing: orthographic straight-down grid RPG room, 4:3 landscape game background, vertical walls aligned to screen axes, no 45 degree or isometric angle, clear 48 pixel square floor grid, same grid perspective as classic top-down 2D games.',
+      'Style/medium: polished crisp pixel art, bright professional tech-office mood, orthographic tile-map game-ready background.',
       'Constraints: no text, no logo, no watermark, no characters, no furniture, no UI panels.'
     ].join('\n')
   },
@@ -31,10 +31,10 @@ const assets = [
       'Asset type: strict 4 by 4 pixel art office prop sprite sheet for a Phaser office RPG.',
       'Primary request: sixteen isolated office props matching the Agent OS Azure pixel office style: employee desk, task board, agent portal, outsource service desk, secretary station, rest sofa, coffee table, plant, storage boxes, water cooler, server vending machine, wall screen, shelf, rug, small robot terminal, floor lamp.',
       'Composition/framing: exact 4 columns by 4 rows grid, each cell 256 by 256 pixels. One prop per cell, centered horizontally with its floor contact point near the lower middle of the cell. Leave equal padding and keep every prop fully inside its cell.',
-      'Perspective: consistent top-down three-quarter RPG perspective, camera about 45 degrees above the floor. All props must share the same scale, angle, floor contact, lighting direction, and pixel density. Desks and sofa should look like they sit on the floor, not front-facing icons.',
+      'Perspective: strict orthographic straight-down/top-down tile-map perspective, no 45 degree angle and no isometric view. All props align to a square grid and are designed as tile objects viewed from above with vertical/horizontal edges. Desks, sofa, board, portal, and service desk should fit cleanly into 48 pixel grid multiples.',
       'Background: flat pure chroma green #00FF00 only, to be removed by post-processing.',
-      'Style/medium: polished crisp pixel art, same palette and lighting as the Azure generated office background.',
-      'Constraints: no text, no watermark, no shadows crossing cells, no full room background, no labels, no front-view catalog icons.'
+      'Style/medium: polished crisp pixel art, same palette and lighting as an orthographic office tile-map background.',
+      'Constraints: no text, no watermark, no shadows crossing cells, no full room background, no labels, no front-view catalog icons, no diagonal/isometric furniture.'
     ].join('\n')
   },
   {
@@ -47,7 +47,7 @@ const assets = [
       'Primary request: six AI agent employees as cute chibi big-head pixel art sprites: Codex coder, Hermes operations agent, Claude Code reviewer, Open Claw tool runner, secretary assistant, temporary portal agent.',
       'Character proportions: large expressive head about 55 to 60 percent of total character height, small body, short legs, readable face, office outfit, game mascot style. Characters should feel like big-head RPG sprites, not realistic adults.',
       'Composition/framing: exact 4 columns by 6 rows grid, each cell 256 by 256 pixels. Each row is one character. Columns are idle front, walk left foot, walk right foot, using device or phone. One centered full-body sprite per cell, feet near lower middle of the cell, equal padding.',
-      'Perspective: same top-down three-quarter RPG perspective as the office, consistent scale across every frame and row, same lighting and pixel density.',
+      'Perspective: orthographic top-down RPG sprite perspective matching a square grid office, no 45 degree or isometric angle, consistent scale across every frame and row, same lighting and pixel density.',
       'Background: flat pure chroma green #00FF00 only, to be removed by post-processing.',
       'Style/medium: crisp readable pixel art, bright tech office RPG, cute chibi mascot proportions.',
       'Constraints: no text, no watermark, no complex background, no overlapping characters, no frame borders, no realistic human proportions.'
